@@ -46,6 +46,9 @@ export function describeAuthError(error: unknown): string {
   if (code.includes('popup-blocked')) return 'المتصفح منع نافذة الدخول بجوجل. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.';
   if (code.includes('network-request-failed')) return 'تعذّر الاتصال. تحقّق من الإنترنت.';
   if (code.includes('operation-not-allowed')) return 'طريقة الدخول هذه غير مفعّلة في مشروع Firebase (فعّلها من Authentication ← Sign-in method).';
+  if (code.includes('unauthorized-domain')) {
+    return 'هذا النطاق غير مصرّح به في مشروع Firebase. أضف نطاق موقعك في Authentication ← Settings ← Authorized domains.';
+  }
   if (code.includes('billing-not-enabled')) return 'إرسال رمز SMS يحتاج ترقية مشروع Firebase إلى خطة Blaze. استخدم توثيق واتساب اليدوي حالياً.';
   if (code.includes('invalid-phone-number')) return 'رقم الهاتف غير صحيح. اكتبه بالصيغة الدولية مثل 218912345678.';
   if (code.includes('invalid-verification-code')) return 'رمز التحقق غير صحيح.';
@@ -53,7 +56,9 @@ export function describeAuthError(error: unknown): string {
   if (code.includes('invalid-app-credential') || code.includes('captcha-check-failed')) {
     return 'فشل التحقق الأمني (reCAPTCHA). أعد تحميل الصفحة وتأكد أن النطاق مضاف في النطاقات المصرّح بها.';
   }
-  return 'حدث خطأ غير متوقع في تسجيل الدخول. حاول مرة أخرى.';
+  return code
+    ? `حدث خطأ غير متوقع في تسجيل الدخول (${code}). حاول مرة أخرى.`
+    : 'حدث خطأ غير متوقع في تسجيل الدخول. حاول مرة أخرى.';
 }
 
 /** يحذف القيم undefined لأن Firestore يرفضها */
