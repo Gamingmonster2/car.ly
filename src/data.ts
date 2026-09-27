@@ -1,9 +1,15 @@
 import type { Car } from './types';
 
+/** مسار صورة محلية داخل مجلد public (يعمل على أي مجلد فرعي بفضل BASE_URL) */
+const img = (file: string): string => `${import.meta.env.BASE_URL}images/cars/${file}`;
+
 /**
  * بيانات توضيحية (تجريبية) تظهر فقط عندما تكون قاعدة البيانات فارغة أو غير متصلة،
  * حتى لا يرى الزائر صفحة فارغة. هذه الإعلانات ليست حقيقية ولا تُنشر لأي أحد،
- * وأرقام الواتساب فيها أرقام الموقع نفسها للتوضيح.
+ * ورقم الواتساب فيها هو رقم إدارة الموقع للتوضيح.
+ *
+ * الصور ملفات محلية داخل public/images/cars (صور مجانية من Unsplash تحت رخصة Unsplash)
+ * ووُصفت كل سيارة بما يطابق صورتها فعلاً.
  */
 export const SAMPLE_CARS: Car[] = [
   {
@@ -13,46 +19,46 @@ export const SAMPLE_CARS: Car[] = [
     year: 2022,
     price: 85000,
     mileage: '24,000 كم',
-    image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?q=80&w=1000&auto=format&fit=crop',
+    image: img('sample-1.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'طرابلس',
     description:
-      'كامري 2022 وارد أمريكي، حادث بسيط جداً على البارد، محرك 2.5 فل أوبشن، فتحة سقف، شاشة أبل كاربلاي، رادار ومحدد مسار.',
+      'كامري 2022 وارد أمريكي، محرك 2.5 فل أوبشن، فتحة سقف، شاشة أبل كاربلاي، رادار ومحدد مسار، بحالة الوكالة.',
     createdAt: Date.now() - 1000 * 60 * 45,
     views: 48,
     ownerName: 'إعلان توضيحي',
   },
   {
     id: 'sample-2',
-    make: 'Hyundai',
-    model: 'Elantra Avante',
-    year: 2021,
-    price: 62000,
-    mileage: '38,000 كم',
-    image: 'https://images.unsplash.com/photo-1623666814372-ec86b24bd0fb?q=80&w=1000&auto=format&fit=crop',
+    make: 'Chevrolet',
+    model: 'Camaro',
+    year: 2019,
+    price: 165000,
+    mileage: '52,000 كم',
+    image: img('sample-2.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'بنغازي',
     description:
-      'النترا أفانتي وارد كوري أصلي، طلاء وكالة خالية من الحوادث، محرك 1.6 سمارت ستريم اقتصادي جداً، كراسي جلد وتسخين وتبريد.',
+      'كمارو وارد أمريكي، محرك V6، جنوط أصلية، طلاء كامل بلا صدمات، فحص كمبيوتر نظيف وجاهزة للتحويل.',
     createdAt: Date.now() - 1000 * 60 * 120,
     views: 73,
     ownerName: 'إعلان توضيحي',
   },
   {
     id: 'sample-3',
-    make: 'Kia',
-    model: 'Sportage GT-Line',
-    year: 2023,
-    price: 115000,
-    mileage: '14,000 كم',
-    image: 'https://images.unsplash.com/photo-1675276329432-8df76f9ef02b?q=80&w=1000&auto=format&fit=crop',
+    make: 'Ford',
+    model: 'Expedition',
+    year: 2020,
+    price: 195000,
+    mileage: '61,000 كم',
+    image: img('sample-3.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'مصراتة',
     description:
-      'سبورتاج شكل جديد فل كامل، محرك تيربو، دفع رباعي AWD، شاشة ديجيتال كاملة، سقف بانوراما، كاميرات 360، بحالة الصفر.',
+      'فورد إكسبدشن عائلي واسع، دفع رباعي، 7 مقاعد جلد، شاشة خلفية، مكيف ممتاز مناسب للسفر والطرق الطويلة.',
     createdAt: Date.now() - 1000 * 60 * 240,
     views: 92,
     ownerName: 'إعلان توضيحي',
@@ -60,33 +66,33 @@ export const SAMPLE_CARS: Car[] = [
   {
     id: 'sample-4',
     make: 'Mercedes-Benz',
-    model: 'E350 AMG',
+    model: 'AMG',
     year: 2019,
-    price: 145000,
+    price: 245000,
     mileage: '65,000 كم',
-    image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop',
+    image: img('sample-4.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'طرابلس',
     description:
-      'مرسيدس E350 كت AMG أصلي، طلاء وكالة بالكامل، إضاءة داخلية 64 لون، نظام صوت بروماستر، صيانة دورية منتظمة بالوكالة.',
+      'مرسيدس AMG، طلاء وكالة بالكامل، إضاءة داخلية ملونة، نظام صوت ممتاز، صيانة دورية منتظمة وموثقة.',
     createdAt: Date.now() - 1000 * 60 * 360,
     views: 135,
     ownerName: 'إعلان توضيحي',
   },
   {
     id: 'sample-5',
-    make: 'Toyota',
-    model: 'Hilux Double Cab',
-    year: 2022,
-    price: 138000,
-    mileage: '42,000 كم',
-    image: 'https://images.unsplash.com/photo-1594246830504-20703f8f6381?q=80&w=1000&auto=format&fit=crop',
+    make: 'BMW',
+    model: '420i كوبيه',
+    year: 2019,
+    price: 155000,
+    mileage: '48,000 كم',
+    image: img('sample-5.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'الزاوية',
     description:
-      'هايلوكس دبل كابينة محرك ديزل 2.4 D4D دبل شغال، مكيف لمس، طلاء مصنع، مناسبة للأعمال والطرق الوعرة، فحص كمبيوتر ممتاز.',
+      'بي إم دبليو 420i كوبيه، محرك تيربو اقتصادي، كراسي جلد، شاشة أصلية، حالة ممتازة وجاهزة للاستخدام اليومي.',
     createdAt: Date.now() - 1000 * 60 * 600,
     views: 110,
     ownerName: 'إعلان توضيحي',
@@ -94,16 +100,16 @@ export const SAMPLE_CARS: Car[] = [
   {
     id: 'sample-6',
     make: 'Nissan',
-    model: 'Patrol Platinum',
-    year: 2021,
-    price: 220000,
-    mileage: '32,000 كم',
-    image: 'https://images.unsplash.com/photo-1606148301666-4beee30310af?q=80&w=1000&auto=format&fit=crop',
+    model: 'GT-R',
+    year: 2017,
+    price: 320000,
+    mileage: '39,000 كم',
+    image: img('sample-6.jpg'),
     whatsapp: '218931792006',
     phone: '0931792006',
     city: 'بنغازي',
     description:
-      'بطل الدروب نيسان باترول V8 بلاتينيوم، شاشات خلفية، مقاعد جلد بيج تبريد وتدفئة، فتحة سقف، هيدروليك ورادار، نظافة ممتازة.',
+      'نيسان GT-R، دفع رباعي، محرك توين تيربو، صيانة كاملة، حالة نادرة لمحبي السيارات الرياضية.',
     createdAt: Date.now() - 1000 * 60 * 60 * 24,
     views: 184,
     ownerName: 'إعلان توضيحي',

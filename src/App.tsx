@@ -265,7 +265,21 @@ export default function App() {
             </h3>
           </div>
 
-          {filteredCars.length === 0 ? (
+          {loading && cars.length === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm animate-pulse">
+                  <div className="aspect-[16/10] bg-slate-200" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-slate-200 rounded w-2/3" />
+                    <div className="h-3 bg-slate-100 rounded w-1/3" />
+                    <div className="h-3 bg-slate-100 rounded w-full" />
+                    <div className="h-9 bg-slate-100 rounded-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredCars.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-dashed border-slate-300 space-y-3">
               <CarIcon className="w-12 h-12 text-slate-400 mx-auto" />
               <p className="text-slate-600 font-bold">لا توجد سيارات مطابقة لبحثك حالياً.</p>
