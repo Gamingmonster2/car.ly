@@ -9,6 +9,26 @@
 
 ---
 
+## 📤 رفع المشروع إلى GitHub
+
+المستودع الهدف: **https://github.com/Gamingmonster2/car.ly** (فارغ وجاهز لاستقبال الملفات).
+المجلد المحلي مُهيّأ كـ Git repository مع commit جاهز وربط `origin` بالمستودع، لذلك الطريقة الأسهل:
+
+**باستخدام GitHub Desktop:**
+1. افتح GitHub Desktop.
+2. `File` ← `Add local repository` ← اختر مجلد المشروع هذا.
+3. اضغط `Push origin` (وإن ظهر `Publish repository` أكمل الخطوات بنفس الاسم `car.ly`).
+4. بعد انتهاء الرفع: `Settings` ← `Pages` ← `Source: GitHub Actions`.
+5. راقب العملية من تبويب `Actions`، وبعد نجاحها يصبح الموقع على:
+   `https://gamingmonster2.github.io/car.ly/`
+
+**باستخدام سطر الأوامر:** اضغط مرتين على `push-to-github.cmd`.
+
+> ملاحظة: ملف `CNAME` للنطاق `cars.com.ly` **غير موجود** عن قصد في هذه النسخة، حتى لا يتعارض
+> النطاق الجديد مع الموقع الحالي أثناء التجربة. أضفه في الخطوة الأخيرة فقط بعد التأكد.
+
+---
+
 ## 🚀 التشغيل المحلي
 
 ```bash
