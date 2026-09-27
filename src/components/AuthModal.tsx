@@ -276,10 +276,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <p className="text-[11px] text-slate-500">سجّل الدخول أولاً لتوثيق رقمك.</p>
           )}
 
-          {phoneOtpEnabled && (
-            <div className="mt-4 space-y-2">
-              <p className="text-[11px] font-bold text-slate-600">أو برمز SMS مباشر:</p>
-              <div id="recaptcha-container" />
+          <div className="mt-4 space-y-2">
+            <p className="text-[11px] font-bold text-slate-600">أو برمز SMS مباشر:</p>
+            {!phoneOtpEnabled && (
+              <p className="text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-2.5 leading-relaxed">
+                رمز SMS معطّل في هذا المشروع حالياً لأنه يحتاج ترقية Firebase إلى خطة Blaze (الرسائل مدفوعة).
+                استخدم «توثيق واتساب» المجاني أعلاه، أو فعّل الخدمة ثم اضبط <code>VITE_ENABLE_PHONE_OTP=true</code>.
+              </p>
+            )}
+            <div id="recaptcha-container" />
               {!otpSent ? (
                 <button
                   onClick={() => run(async () => {
@@ -288,8 +293,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     setOtpSent(true);
                     setInfo('أرسلنا رمزاً برسالة نصية. اكتبه أدناه.');
                   })}
-                  disabled={busy}
-                  className="w-full border border-slate-300 hover:bg-slate-50 font-bold py-2.5 rounded-xl text-xs"
+                  disabled={busy || !phoneOtpEnabled}
+                  className="w-full border border-slate-300 hover:bg-slate-50 font-bold py-2.5 rounded-xl text-xs disabled:opacity-50"
                 >
                   إرسال رمز SMS
                 </button>
@@ -315,8 +320,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   </button>
                 </div>
               )}
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

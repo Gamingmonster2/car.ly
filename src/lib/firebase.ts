@@ -23,12 +23,22 @@ const firebaseConfig = {
 export const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
 
 /**
- * اسم قاعدة بيانات Firestore.
- * - إن كان فارغاً أو '(default)' نستخدم القاعدة الافتراضية (getFirestore عادي).
- * - وإن كان مُسمّى (Named database) نمرّره كما هو.
- * مفيد عند الانتقال إلى مشروع Firebase جديد بقاعدة افتراضية دون تعديل الكود.
+ * معرّف قاعدة بيانات Firestore الخاصة بمشروع AI Studio.
+ *
+ * مهم: Firebase لا تسمح بإعادة تسمية قاعدة بيانات موجودة إطلاقاً — هذا معرّف ثابت
+ * وليس «اسماً» قابلاً للتعديل، ولا يؤثر على السرعة ولا يراه الزائر.
+ * إن أردت التخلص منه نهائياً فالحل الوحيد: إنشاء قاعدة بيانات افتراضية (default)
+ * جديدة في نفس المشروع، ثم ضبط VITE_FIREBASE_DATABASE_ID=(default) أو تركه فارغاً
+ * (مع ملاحظة أن الإعلانات الحالية تبقى في القاعدة القديمة وتحتاج نقلاً يدوياً).
  */
-const rawDatabaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID ?? 'ai-studio-carslibya-f8cf7d50-bd16-44a3-8284-47deae4aef16';
+const AI_STUDIO_DATABASE_ID = 'ai-studio-carslibya-f8cf7d50-bd16-44a3-8284-47deae4aef16';
+
+/**
+ * اسم قاعدة بيانات Firestore:
+ * - إن كان فارغاً أو '(default)' نستخدم القاعدة الافتراضية.
+ * - وإن كان مُسمّى (Named database) نمرّره كما هو.
+ */
+const rawDatabaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID ?? AI_STUDIO_DATABASE_ID;
 const namedDatabaseId = rawDatabaseId === '(default)' ? '' : rawDatabaseId.trim();
 
 export const db = namedDatabaseId
