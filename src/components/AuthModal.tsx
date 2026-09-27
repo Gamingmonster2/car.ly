@@ -9,12 +9,13 @@ interface AuthModalProps {
   onSuccess?: () => void;
 }
 
-type Mode = 'login' | 'signup';
+type Mode = 'login' | 'signup' | 'quick';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const {
     signInWithEmail,
     signUpWithEmail,
+    signInQuickPhone,
     signInWithGoogle,
     resetPassword,
     startPhoneVerification,
@@ -58,6 +59,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     run(async () => {
       if (mode === 'login') {
         await signInWithEmail(email, password);
+      } else if (mode === 'quick') {
+        if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
+        if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
+        await signInQuickPhone(name, phone, city);
+        setInfo('تم إنشاء حسابك السريع. وثّق رقمك الآن من صفحتك الشخصية ليظهر بجانب إعلاناتك «رقم موثّق».');
       } else {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
         if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
@@ -81,11 +87,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </button>
 
         <h3 className="text-xl font-black text-slate-900 mb-1">
-          {mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
+          {mode === 'login' ? 'تسجيل الدخول' : mode === 'quick' ? 'دخول سريع برقم الواتساب' : 'إنشاء حساب جديد'}
         </h3>
-        <p className="text-xs text-slate-500 mb-5">
-          حسابك يمنحك صفحة شخصية تعرض إعلاناتك، وتمكّنك من تعديلها أو حذفها في أي وقت.
+        <p className="text-xs text-slate-500 mb-4">
+          {mode === 'quick'
+            ? 'بدون بريد ولا كلمة مرور: اكتب اسمك ورقمك وابدأ النشر فوراً، ثم وثّق رقمك عبر واتساب.'
+            : 'حسابك يمنحك صفحة شخصية تعرض إعلاناتك، وتمكّنك من تعديلها أو حذفها في أي وقت.'}
         </p>
+
+        <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl mb-4 text-[11px] font-bold">
+          {([['login', 'دخول'], ['signup', 'حساب جديد'], ['quick', 'دخول سريع 📱']] as const).map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => { setMode(value); setError(null); setInfo(null); }}
+              className={`py-2 rounded-lg transition-colors ${mode === value ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
         <button
           onClick={() => run(async () => { await signInWithGoogle(); onSuccess?.(); onClose(); })}
@@ -103,7 +123,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          {mode === 'signup' && (
+          {mode !== 'login' && (
             <>
               <Field icon={<User className="w-4 h-4" />} label="الاسم الكامل">
                 <input
@@ -138,6 +158,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             </>
           )}
 
+          {mode !== 'quick' && (<>
           <Field icon={<Mail className="w-4 h-4" />} label="البريد الإلكتروني">
             <input
               type="email"
@@ -161,6 +182,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             />
           </Field>
 
+          </>)}
           {error && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5">{error}</p>}
           {info && <p className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">{info}</p>}
 
@@ -172,7 +194,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             }`}
           >
             {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-            <span>{mode === 'login' ? 'دخول' : 'إنشاء الحساب'}</span>
+            <span>{mode === 'login' ? 'دخول' : mode === 'quick' ? 'ابدأ الآن' : 'إنشاء الحساب'}</span>
           </button>
         </form>
 

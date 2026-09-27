@@ -14,6 +14,7 @@ import {
   onAuthStateChanged,
   sendEmailVerification,
   sendPasswordResetEmail,
+  signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPhoneNumber,
   signInWithPopup,
@@ -77,6 +78,11 @@ interface AuthContextValue {
   /** تسجيل حساب بالبريد: الاسم ورقم الواتساب مطلوبان لإنشاء الصفحة الشخصية */
   signUpWithEmail: (email: string, password: string, name: string, phone: string, city?: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
+  /**
+   * دخول سريع بالهاتف: ينشئ حساب Firebase مجهول الهوية (Anonymous Auth) فيحصل المستخدم
+   * على uid حقيقي يقبل به Firestore، ثم يوثّق رقمه عبر واتساب. لا يحتاج كلمة مرور.
+   */
+  signInQuickPhone: (name: string, phone: string, city?: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   /** إرسال رمز SMS (يحتاج تفعيل الخطة المدفوعة) */
@@ -105,6 +111,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
   const confirmationRef = useRef<ConfirmationResult | null>(null);
   const verifierRef = useRef<RecaptchaVerifier | null>(null);
+  /** أحدث نسخة من الملف الشخصي، لتفادي الكتابة فوق بيانات المستخدم عند تسجيل الدخول السريع */
+  const profileRef = useRef<UserProfile | null>(profile);
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   const persistLocal = useCallback((next: UserProfile | null) => {
     try {
@@ -149,6 +160,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       } catch (error) {
         console.error('تعذّر قراءة الملف الشخصي:', error);
+      }
+      // إن كان لدينا ملف محلي لنفس المستخدم (مثل الدخول السريع) نعتمد بياناته ولا نستبدلها
+      const local = profileRef.current;
+      if (local && local.uid === user.uid) {
+        setProfile(local);
+        persistLocal(local);
+        try {
+          await setDoc(doc(db, USERS_COLLECTION, user.uid), prune({ ...local }), { merge: true });
+        } catch (error) {
+          console.error('تعذّر مزامنة الملف الشخصي:', error);
+        }
+        return;
       }
       // إن لم يوجد الملف (أو تعذّرت القراءة) ننشئ واحداً محلياً على الأقل
       const fallback: UserProfile = {
@@ -221,6 +244,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     await signInWithPopup(auth, provider);
+  };
+
+  const signInQuickPhone = async (name: string, phone: string, city?: string) => {
+    const cleanName = name.trim();
+    const normalizedPhone = normalizeWhatsApp(phone);
+    const credential = await signInAnonymously(auth);
+    try {
+      await updateAuthProfile(credential.user, { displayName: cleanName });
+    } catch {
+      /* غير حرج */
+    }
+    await saveProfile({
+      uid: credential.user.uid,
+      displayName: cleanName,
+      phone: normalizedPhone,
+      city: city || 'طرابلس',
+      avatarEmoji: '🚗',
+      phoneStatus: 'pending',
+      phoneVerified: false,
+      createdAt: Date.now(),
+    });
   };
 
   const resetPassword = async (email: string) => {
@@ -301,6 +345,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     phoneOtpEnabled: PHONE_OTP_ENABLED,
     signUpWithEmail,
     signInWithEmail,
+    signInQuickPhone,
     signInWithGoogle,
     resetPassword,
     startPhoneVerification,
