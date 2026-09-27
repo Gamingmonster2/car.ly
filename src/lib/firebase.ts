@@ -20,18 +20,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '1:693691274781:web:cc15f62ad313d881bad8f4',
 };
 
-/** اسم قاعدة بيانات Firestore المُسمّاة في هذا المشروع (وليست قاعدة (default)) */
-const firestoreDatabaseId =
-  import.meta.env.VITE_FIREBASE_DATABASE_ID ??
-  'ai-studio-carslibya-f8cf7d50-bd16-44a3-8284-47deae4aef16';
-
 export const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const db = initializeFirestore(
-  app,
-  { experimentalAutoDetectLongPolling: true },
-  firestoreDatabaseId,
-);
+/**
+ * اسم قاعدة بيانات Firestore.
+ * - إن كان فارغاً أو '(default)' نستخدم القاعدة الافتراضية (getFirestore عادي).
+ * - وإن كان مُسمّى (Named database) نمرّره كما هو.
+ * مفيد عند الانتقال إلى مشروع Firebase جديد بقاعدة افتراضية دون تعديل الكود.
+ */
+const rawDatabaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID ?? 'ai-studio-carslibya-f8cf7d50-bd16-44a3-8284-47deae4aef16';
+const namedDatabaseId = rawDatabaseId === '(default)' ? '' : rawDatabaseId.trim();
+
+export const db = namedDatabaseId
+  ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, namedDatabaseId)
+  : initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
 export const auth = getAuth(app);
 /** اللغة العربية لرسائل Firebase (مثل رسائل البريد) */
