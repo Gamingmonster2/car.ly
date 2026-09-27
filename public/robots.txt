@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cars.com.ly/sitemap.xml

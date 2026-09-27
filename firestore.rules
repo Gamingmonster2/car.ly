@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. قاعدة الرفض التلقائي الافتراضية
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // تدقيق بيانات السيارة لمنع أي هجمات أو بيانات عشوائية
+    function isValidCar(data) {
+      return data.keys().hasAll(['make', 'model', 'year', 'price', 'city', 'whatsapp'])
+        && data.make is string && data.make.size() >= 2 && data.make.size() <= 50
+        && data.model is string && data.model.size() >= 1 && data.model.size() <= 50
+        && data.year is number && data.year >= 1980 && data.year <= 2030
+        && data.price is number && data.price >= 500 && data.price <= 5000000
+        && data.city is string && data.city.size() <= 50
+        && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 20
+        && (!('slug' in data) || (data.slug is string && data.slug.size() <= 100))
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 20))
+        && (!('engine' in data) || (data.engine is string && data.engine.size() <= 100))
+        && (!('transmission' in data) || (data.transmission is string && data.transmission.size() <= 100))
+        && (!('images' in data) || data.images is list)
+        && (!('features' in data) || data.features is list)
+        && (!('description' in data) || (data.description is string && data.description.size() <= 2000))
+        && (!('image' in data) || (data.image is string && data.image.size() <= 300000))
+        && (!('mileage' in data) || (data.mileage is string && data.mileage.size() <= 50))
+        && (!('ownerId' in data) || (data.ownerId is string && data.ownerId.size() <= 128))
+        && (!('ownerName' in data) || (data.ownerName is string && data.ownerName.size() <= 100))
+        && (!('createdAt' in data) || data.createdAt is number)
+        && (!('views' in data) || (data.views is number && data.views >= 0));
+    }
+
+    function isValidCarUpdate(data) {
+      return isValidCar(data)
+        && (!('ownerId' in existing()) || incoming().ownerId == existing().ownerId);
+    }
+
+    // تدقيق الملف الشخصي للمستخدم
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'displayName'])
+        && data.uid is string && data.uid == request.auth.uid
+        && data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 100
+        && (!('email' in data) || (data.email is string && data.email.size() <= 150))
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 20))
+        && (!('city' in data) || (data.city is string && data.city.size() <= 50))
+        && (!('createdAt' in data) || data.createdAt is number);
+    }
+
+    // إعلانات السيارات
+    match /cars/{carId} {
+      allow get, list: if true;
+      allow create: if isValidCar(incoming()) && (
+        !('ownerId' in incoming()) || (isSignedIn() && incoming().ownerId == request.auth.uid)
+      );
+      // حماية الملكية: المالك فقط من يمكنه تعديل أو حذف إعلانه
+      allow update: if isSignedIn() && isValidCarUpdate(incoming()) && existing().ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && existing().ownerId == request.auth.uid;
+    }
+
+    // ملفات المستخدمين (عزل وحماية بيانات المستخدمين الشخصية)
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create, update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow delete: if false;
+    }
+  }
+}
