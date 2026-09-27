@@ -5,7 +5,7 @@ import type { Car } from '../types';
 const CARS_COLLECTION = 'cars';
 
 /** أقصى مدة انتظار لقاعدة البيانات قبل التحويل إلى وضع العرض التجريبي */
-const LOAD_TIMEOUT_MS = 7000;
+const LOAD_TIMEOUT_MS = 12000;
 
 /**
  * يضيف مهلة زمنية لأي وعد: إذا لم تُجب قاعدة البيانات خلال المدة المحددة

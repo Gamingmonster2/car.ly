@@ -167,7 +167,7 @@ export default function App() {
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-900 font-sans overflow-x-hidden">
 
       {/* Toast Notification */}
       {toast && (
@@ -181,23 +181,24 @@ export default function App() {
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-              <CarIcon className="w-7 h-7" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+              <CarIcon className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight text-slate-900">سوق سيارات ليبيا</h1>
-              <span className="text-xs font-semibold text-blue-600">cars.com.ly</span>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-2xl font-black tracking-tight text-slate-900 whitespace-nowrap">سوق سيارات ليبيا</h1>
+              <span className="block text-[10px] sm:text-xs font-semibold text-blue-600">cars.com.ly</span>
             </div>
           </div>
 
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-xl shadow-lg shadow-blue-600/25 transition-all hover:scale-105 active:scale-95 text-sm"
+            className="shrink-0 flex items-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-blue-600/25 transition-all hover:scale-105 active:scale-95 text-xs sm:text-sm"
           >
-            <Plus className="w-5 h-5" />
-            <span>أضف سيارتك مجاناً</span>
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="sm:hidden">أضف سيارة</span>
+            <span className="hidden sm:inline">أضف سيارتك مجاناً</span>
           </button>
         </div>
       </header>
@@ -220,7 +221,7 @@ export default function App() {
             <Sparkles className="w-4 h-4" />
             <span>المنصة المباشرة لبيع وشراء السيارات في ليبيا</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight">
             ابحث عن سيارتك القادمة <span className="text-blue-600">بكل سهولة</span>
           </h2>
           <p className="text-slate-600 text-base">
