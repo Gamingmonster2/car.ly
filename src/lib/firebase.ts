@@ -1,4 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { initializeFirestore } from 'firebase/firestore';
 
 /**
@@ -31,3 +32,20 @@ export const db = initializeFirestore(
   { experimentalAutoDetectLongPolling: true },
   firestoreDatabaseId,
 );
+
+export const auth = getAuth(app);
+/** اللغة العربية لرسائل Firebase (مثل رسائل البريد) */
+auth.languageCode = 'ar';
+
+/**
+ * رقم واتساب إدارة الموقع (يُستخدم لاستقبال كود توثيق الحسابات).
+ * يمكن تغييره من ملف .env باسم VITE_ADMIN_WHATSAPP
+ */
+export const ADMIN_WHATSAPP = import.meta.env.VITE_ADMIN_WHATSAPP ?? '218931792006';
+
+/**
+ * تفعيل رمز تحقق SMS عبر Firebase Phone Auth.
+ * لا يعمل إلا بعد ترقية مشروع Firebase إلى خطة Blaze (الرسائل مدفوعة) وتفعيل مزوّد Phone
+ * والسماح بمنطقة ليبيا (+218) في سياسة مناطق SMS. لذلك هو مغلق افتراضياً.
+ */
+export const PHONE_OTP_ENABLED = import.meta.env.VITE_ENABLE_PHONE_OTP === 'true';
