@@ -37,7 +37,10 @@ jobs:
         run: npm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
+        with:
+          # يفعّل GitHub Pages تلقائياً إذا لم يكن مفعّلاً بعد (Source: GitHub Actions)
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

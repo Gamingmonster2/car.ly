@@ -1,5 +1,7 @@
 # CARS.COM.LY — سوق السيارات الليبي
 
+[![Deploy to GitHub Pages](https://github.com/Gamingmonster2/car.ly/actions/workflows/deploy.yml/badge.svg)](https://github.com/Gamingmonster2/car.ly/actions/workflows/deploy.yml)
+
 منصة لبيع وشراء السيارات في ليبيا (تواصل مباشر بدون وسيط) مبنية بـ **React 19 + TypeScript + Vite 6 + TailwindCSS 4 + Firebase Firestore**.
 
 > **ملاحظة مهمة:** هذا المستودع نسخة نظيفة أُعيد بناؤها. المستودع القديم كان يحتوي مكوّنات فارغة
