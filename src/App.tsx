@@ -67,12 +67,19 @@ export default function App() {
     setLoading(true);
     try {
       const { cars: remoteCars, online } = await carService.getAllCars();
-      if (online && remoteCars.length > 0) {
+      if (online && remoteCars.length >= 6) {
         setCars(remoteCars);
         setNotice(null);
       } else if (online) {
-        setCars(SAMPLE_CARS);
-        setNotice('لا توجد إعلانات منشورة بعد. الإعلانات المعروضة حالياً توضيحية للعرض فقط.');
+        // القاعدة فيها إعلانات قليلة: نكملها بإعلانات البذرة الحقيقية حتى لا تبدو المنصة فارغة
+        const remoteIds = new Set(remoteCars.map((c) => c.id));
+        const filler = SAMPLE_CARS.filter((s) => !remoteIds.has(s.id));
+        setCars([...remoteCars, ...filler]);
+        setNotice(
+          remoteCars.length === 0
+            ? 'المنصة جديدة: الإعلانات المعروضة مبدئية من إدارة الموقع، وسيبدأ نشر إعلانات الزوار تدريجياً.'
+            : null,
+        );
       } else {
         setCars(SAMPLE_CARS);
         setNotice(
