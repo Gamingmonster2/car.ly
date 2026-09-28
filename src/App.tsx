@@ -378,7 +378,7 @@ function CarCard({
           <div className="flex items-start justify-between gap-2">
             <h4 className="text-base font-black">{car.make} {car.model}</h4>
             <span className="text-base font-black text-blue-600 whitespace-nowrap">
-              {car.price.toLocaleString()} <span className="text-[11px]">د.ل</span>
+              {car.price > 0 ? car.price.toLocaleString() + ' د.ل' : 'السعر عند الاتصال'}
             </span>
           </div>
           <div className="flex items-center gap-2 mt-2 text-[11px] font-semibold text-slate-500 flex-wrap">
