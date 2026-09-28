@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  limit,
   query,
   setDoc,
   where,
@@ -12,6 +13,9 @@ import { db } from './firebase';
 import type { Car } from '../types';
 
 const CARS_COLLECTION = 'cars';
+
+/** أقصى عدد إعلانات تُحمّل في الصفحة الرئيسية (يمنع تحميل آلاف المستندات مع نمو الموقع) */
+const HOME_LIMIT = 60;
 
 /** أقصى مدة انتظار لقاعدة البيانات قبل التحويل إلى وضع العرض التجريبي */
 const LOAD_TIMEOUT_MS = 12000;
@@ -71,7 +75,10 @@ export const carService = {
     try {
       // بلا orderBy في الاستعلام: الترتيب يتم على العميل، لأن Firestore
       // يستبعد أي مستند لا يحتوي الحقل المستخدم في orderBy.
-      const snapshot = await withTimeout(getDocs(collection(db, CARS_COLLECTION)), LOAD_TIMEOUT_MS);
+      const snapshot = await withTimeout(
+        getDocs(query(collection(db, CARS_COLLECTION), limit(HOME_LIMIT))),
+        LOAD_TIMEOUT_MS,
+      );
       const cars = snapshot.docs.map((docSnap) => ({
         ...(docSnap.data() as Omit<Car, 'id'>),
         id: docSnap.id,

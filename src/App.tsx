@@ -336,7 +336,8 @@ function CarCard({
   const gallery = car.images && car.images.length > 0 ? car.images : car.image ? [car.image] : [];
   const [active, setActive] = useState(0);
   const [showGallery, setShowGallery] = useState(false);
-  const image = gallery[active] ?? PLACEHOLDER_IMAGE;
+  // المصغّرة الخفيفة تُعرض في القائمة (تصفح سريع)، والصورة الكاملة عند فتح المعرض
+  const image = active === 0 && car.thumb ? car.thumb : gallery[active] ?? PLACEHOLDER_IMAGE;
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">

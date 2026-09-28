@@ -279,7 +279,7 @@ export default function MyPage({ onBack, onEdit, onToast }: MyPageProps) {
             {myCars.map((car) => (
               <div key={car.id} className="bg-white rounded-2xl border border-slate-200 p-3 flex items-center gap-3 flex-wrap">
                 <img
-                  src={car.image || `${import.meta.env.BASE_URL}car-placeholder.svg`}
+                  src={car.thumb || car.images?.[0] || car.image || `${import.meta.env.BASE_URL}car-placeholder.svg`}
                   alt={`${car.make} ${car.model}`}
                   className="w-20 h-16 rounded-xl object-cover bg-slate-100"
                   loading="lazy"

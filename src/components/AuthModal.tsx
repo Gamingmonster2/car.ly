@@ -25,7 +25,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     profile,
   } = useAuth();
 
-  const [mode, setMode] = useState<Mode>('login');
+  const [mode, setMode] = useState<Mode>('quick');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -216,8 +216,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
         </div>
 
-        {/* توثيق رقم الهاتف */}
-        <div className="mt-6 pt-5 border-t border-slate-200">
+        {/* خيارات متقدمة (مطوية لتبسيط الدخول) */}
+        <details className="mt-5 pt-4 border-t border-slate-200">
+          <summary className="cursor-pointer text-[11px] font-bold text-slate-500 hover:text-slate-700">
+            خيارات متقدمة: توثيق رقم الواتساب أو الدخول برمز SMS
+          </summary>
+        <div className="mt-3">
           <h4 className="text-sm font-black text-slate-900 flex items-center gap-2 mb-1">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>توثيق رقم الواتساب</span>
@@ -322,6 +326,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
           </div>
         </div>
+        </details>
       </div>
     </div>
   );

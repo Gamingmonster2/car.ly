@@ -62,9 +62,7 @@ service cloud.firestore {
     // إعلانات السيارات
     match /cars/{carId} {
       allow get, list: if true;
-      allow create: if isValidCar(incoming()) && (
-        !('ownerId' in incoming()) || (isSignedIn() && incoming().ownerId == request.auth.uid)
-      );
+      allow create: if isValidCar(incoming()) && isSignedIn() && incoming().ownerId == request.auth.uid;
       // حماية الملكية: المالك فقط من يمكنه تعديل أو حذف إعلانه
       allow update: if isSignedIn() && isValidCarUpdate(incoming()) && existing().ownerId == request.auth.uid;
       allow delete: if isSignedIn() && existing().ownerId == request.auth.uid;
@@ -73,7 +71,12 @@ service cloud.firestore {
     // ملفات المستخدمين (عزل وحماية بيانات المستخدمين الشخصية)
     match /users/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
-      allow create, update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      // المستخدم ينشئ/يعدّل ملفه، لكنه لا يستطيع منح نفسه شارة «رقم موثّق»
+      // (حقلا phoneVerified و phoneStatus لا يقبلان 'verified' من المستخدم،
+      //  والتوثيق يتم من لوحة Firebase أو من لوحة الإدارة لاحقاً)
+      allow create, update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming())
+        && (!('phoneVerified' in incoming()) || incoming().phoneVerified == false)
+        && (!('phoneStatus' in incoming()) || incoming().phoneStatus in ['none', 'pending']);
       allow delete: if false;
     }
   }

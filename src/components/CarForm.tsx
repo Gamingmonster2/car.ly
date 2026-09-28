@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Images, Loader2, Plus, Trash2, X } from 'lucide-react';
 import { useAuth } from '../lib/authContext';
 import { carService, describeFirestoreError } from '../lib/carService';
-import { MAX_PHOTOS, base64Bytes, compressImageFiles, totalBytes } from '../lib/image';
+import { MAX_PHOTOS, MAX_TOTAL_BYTES, base64Bytes, compressImageFiles, makeThumbnail, totalBytes } from '../lib/image';
 import { displayLocal, isValidWhatsApp, normalizeWhatsApp } from '../lib/phone';
 import type { Car } from '../types';
 
 const CITIES = ['طرابلس', 'بنغازي', 'مصراتة', 'الزاوية', 'زليتن', 'البيضاء', 'سبها', 'درنة', 'طبرق', 'غريان', 'الخمس', 'صبراتة'];
-const MAX_TOTAL_BYTES = 620 * 1024;
 
 interface CarFormProps {
   isOpen: boolean;
@@ -32,6 +31,8 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
   const { firebaseUser, profile } = useAuth();
   const [form, setForm] = useState(emptyForm);
   const [photos, setPhotos] = useState<string[]>([]);
+  /** مصغّرة خفيفة للصورة الأساسية تُعرض في قائمة الإعلانات */
+  const [thumb, setThumb] = useState<string>('');
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
         description: editing.description,
       });
       setPhotos(editing.images && editing.images.length > 0 ? editing.images : editing.image ? [editing.image] : []);
+      setThumb(editing.thumb ?? '');
     } else {
       setForm({ ...emptyForm, whatsapp: profile?.phone ? displayLocal(profile.phone) : '', city: profile?.city ?? 'طرابلس' });
       setPhotos([]);
@@ -71,12 +73,19 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
       if (room <= 0) throw new Error(`الحد الأقصى ${MAX_PHOTOS} صور لكل إعلان.`);
       const selected = files.slice(0, room);
       setProgress(`جاري ضغط الصور (0/${selected.length})...`);
-      const compressed = await compressImageFiles(selected, (done, total) =>
-        setProgress(`جاري ضغط الصور (${done}/${total})...`),
+      const compressed = await compressImageFiles(
+        selected,
+        (done, total) => setProgress(`جاري ضغط الصور (${done}/${total})...`),
+        photos.length,
       );
       const next = [...photos, ...compressed];
       if (totalBytes(next) > MAX_TOTAL_BYTES) {
         throw new Error('مجموع الصور كبير جداً. احذف صورة أو صوّر بجودة أقل.');
+      }
+      // المصغّرة تُبنى من الصورة الأساسية مرة واحدة عند إضافة أول صورة
+      if (photos.length === 0 && next.length > 0 && !thumb) {
+        setProgress('جاري تجهيز صورة العرض...');
+        setThumb(await makeThumbnail(next[0]));
       }
       setPhotos(next);
     } catch (err) {
@@ -121,8 +130,10 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
       phone: displayLocal(whatsapp),
       description:
         form.description.trim().slice(0, 2000) || 'سيارة بحالة جيدة، للمعاينة والتواصل المباشر عبر الواتساب.',
-      image: photos[0] ?? `${import.meta.env.BASE_URL}car-placeholder.svg`,
+      // لا نكرّر الصورة الأساسية: تُخزَّن مرة واحدة في images[0] + مصغّرة خفيفة
       images: photos,
+      ...(thumb ? { thumb } : {}),
+      ...(photos.length === 0 ? { image: `${import.meta.env.BASE_URL}car-placeholder.svg` } : {}),
       ownerId: firebaseUser.uid,
       ownerName: profile?.displayName ?? 'مستخدم',
     };
@@ -221,6 +232,10 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
           {/* صور السيارة من كاميرا الهاتف */}
           <div>
             <Label>صور السيارة (حتى {MAX_PHOTOS} صور)</Label>
+            <p className="text-[11px] text-slate-500 mb-2 leading-relaxed">
+              لأفضل نتيجة: صوّر السيارة <strong>أفقيّاً</strong> من الخارج (أمامي، خلفي، جانبي، الداخلية) في ضوء
+              النهار. الصورة الأولى هي <strong>الصورة الرئيسية</strong> وتُحفظ بجودة أعلى لأنها تظهر في نتائج البحث.
+            </p>
             <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handlePick} className="hidden" />
             <input ref={galleryRef} type="file" accept="image/*" multiple onChange={handlePick} className="hidden" />
 

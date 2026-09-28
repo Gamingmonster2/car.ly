@@ -6,10 +6,12 @@ export interface Car {
   year: number;
   price: number;
   mileage: string;
-  /** الصورة الأساسية (Base64 مضغوطة أو مسار محلي) */
-  image: string;
-  /** معرض الصور (حتى 4 صور من كاميرا الهاتف) */
+  /** الصورة الأساسية (للإعلانات القديمة فقط — الجديدة تستخدم images[0]) */
+  image?: string;
+  /** معرض الصور الكامل (حتى 4 صور من كاميرا الهاتف) */
   images?: string[];
+  /** صورة مصغّرة خفيفة (≈18 كيلوبايت) تُعرض في قائمة الإعلانات لتسريع التصفح */
+  thumb?: string;
   whatsapp: string;
   phone?: string;
   city: string;
