@@ -72,11 +72,16 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
       // المستخدم ينشئ/يعدّل ملفه، لكنه لا يستطيع منح نفسه شارة «رقم موثّق»
-      // (حقلا phoneVerified و phoneStatus لا يقبلان 'verified' من المستخدم،
-      //  والتوثيق يتم من لوحة Firebase أو من لوحة الإدارة لاحقاً)
-      allow create, update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming())
+      // ملاحظة: يُسمح بالإبقاء على القيمة الحالية كما هي (لمن وثّقته الإدارة)
+      // حتى يستطيع المستخدم الموثّق تعديل اسمه أو صورته لاحقاً دون أن تُرفض العملية.
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming())
         && (!('phoneVerified' in incoming()) || incoming().phoneVerified == false)
         && (!('phoneStatus' in incoming()) || incoming().phoneStatus in ['none', 'pending']);
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming())
+        && (!('phoneVerified' in incoming()) || incoming().phoneVerified == false
+            || incoming().phoneVerified == existing().phoneVerified)
+        && (!('phoneStatus' in incoming()) || incoming().phoneStatus in ['none', 'pending']
+            || incoming().phoneStatus == existing().phoneStatus);
       allow delete: if false;
     }
   }
