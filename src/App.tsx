@@ -24,6 +24,7 @@ import { carService, daysLeft, describeFirestoreError, isExpired } from './lib/c
 import { useAuth } from './lib/authContext';
 import { SAMPLE_CARS } from './data';
 import { waLink } from './lib/phone';
+import { expiresIn, timeAgo } from './lib/timeAgo';
 import AuthModal from './components/AuthModal';
 import CarForm from './components/CarForm';
 import MyPage from './components/MyPage';
@@ -272,7 +273,7 @@ export default function App() {
             </div>
 
             {loading && cars.length === 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="flex flex-col gap-4 max-w-2xl mx-auto">
                 {[1, 2, 3].map((n) => (
                   <div key={n} className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm animate-pulse">
                     <div className="aspect-[16/10] bg-slate-200" />
@@ -297,7 +298,7 @@ export default function App() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="flex flex-col gap-4 max-w-2xl mx-auto">
                 {filteredCars.map((car) => (
                   <CarCard
                     key={car.id}
@@ -396,6 +397,10 @@ function CarCard({
               <Gauge className="w-3 h-3 text-slate-400" /> {car.mileage}
             </span>
             {car.ownerName && <span className="text-slate-400">• {car.ownerName}</span>}
+            {car.createdAt && <span className="text-slate-400">• {timeAgo(car.createdAt)}</span>}
+            {left !== null && left >= 0 && left <= 7 && (
+              <span className="text-amber-600">• {expiresIn(car.expiresAt)}</span>
+            )}
           </div>
           <p className="text-slate-600 text-xs mt-2 line-clamp-2 leading-relaxed">{car.description}</p>
         </div>
