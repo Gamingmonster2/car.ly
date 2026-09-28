@@ -10,6 +10,7 @@ import {
   MapPin,
   MessageCircle,
   Pencil,
+  Phone,
   Plus,
   Search,
   Sparkles,
@@ -19,7 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import type { Car } from './types';
-import { carService, describeFirestoreError } from './lib/carService';
+import { carService, daysLeft, describeFirestoreError, isExpired } from './lib/carService';
 import { useAuth } from './lib/authContext';
 import { SAMPLE_CARS } from './data';
 import { waLink } from './lib/phone';
@@ -338,6 +339,8 @@ function CarCard({
   const [showGallery, setShowGallery] = useState(false);
   // المصغّرة الخفيفة تُعرض في القائمة (تصفح سريع)، والصورة الكاملة عند فتح المعرض
   const image = active === 0 && car.thumb ? car.thumb : gallery[active] ?? PLACEHOLDER_IMAGE;
+  const expired = isExpired(car);
+  const left = daysLeft(car);
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
@@ -364,6 +367,9 @@ function CarCard({
         )}
         {isOwner && (
           <span className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg">إعلاني</span>
+        )}
+        {expired && !isOwner && (
+          <span className="absolute top-3 left-3 bg-rose-600/90 text-white text-[10px] font-bold px-2 py-1 rounded-lg">انتهت الصلاحية</span>
         )}
       </div>
 
@@ -396,6 +402,14 @@ function CarCard({
           >
             <MessageCircle className="w-4 h-4" />
             واتساب
+          </a>
+          {/* مكالمة هاتفية عادية: يفتح تطبيق الاتصال مباشرة برقم المعلن */}
+          <a
+            href={`tel:+${car.phone ? car.phone.replace(/\D/g, '') : car.whatsapp.replace(/\D/g, '')}`}
+            className="flex-1 border border-blue-200 text-blue-700 hover:bg-blue-50 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm"
+          >
+            <Phone className="w-4 h-4" />
+            اتصال
           </a>
           {isOwner && (
             <>

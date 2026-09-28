@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Images, Loader2, Plus, Trash2, X } from 'lucide-react';
 import { useAuth } from '../lib/authContext';
-import { carService, describeFirestoreError } from '../lib/carService';
+import { carService, defaultExpiresAt, describeFirestoreError } from '../lib/carService';
 import { MAX_PHOTOS, MAX_TOTAL_BYTES, base64Bytes, compressImageFiles, makeThumbnail, totalBytes } from '../lib/image';
 import { displayLocal, isValidWhatsApp, normalizeWhatsApp } from '../lib/phone';
 import type { Car } from '../types';
@@ -145,8 +145,14 @@ export default function CarForm({ isOpen, onClose, onSaved, onRequireAuth, editi
         await carService.updateCar(editing.id, payload);
         onSaved('تم تحديث إعلانك بنجاح.');
       } else {
-        await carService.addCar({ ...payload, createdAt: Date.now() });
-        onSaved('تم نشر إعلانك بنجاح وسيظهر للزوار.');
+        const now = Date.now();
+        await carService.addCar({
+          ...payload,
+          createdAt: now,
+          expiresAt: defaultExpiresAt(now),
+          status: 'pending',
+        });
+        onSaved('تم إرسال إعلانك للمراجعة، وسيظهر للزوار بعد الموافقة عليه — مدة النشر 30 يوماً.');
       }
       onClose();
     } catch (err) {

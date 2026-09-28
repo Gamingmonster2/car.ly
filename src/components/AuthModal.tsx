@@ -16,6 +16,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     signInWithEmail,
     signUpWithEmail,
     signInQuickPhone,
+    signUpWithPhonePassword,
+    signInWithPhonePassword,
     signInWithGoogle,
     resetPassword,
     startPhoneVerification,
@@ -62,8 +64,23 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       } else if (mode === 'quick') {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
         if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
-        await signInQuickPhone(name, phone, city);
-        setInfo('تم إنشاء حسابك السريع. وثّق رقمك الآن من صفحتك الشخصية ليظهر بجانب إعلاناتك «رقم موثّق».');
+        if (password.length >= 6) {
+          // كلمة مرور = حساب دائم يفتح من أي جهاز
+          try {
+            await signInWithPhonePassword(phone, password);
+          } catch (err) {
+            const code = String((err as { code?: string })?.code ?? '');
+            if (code.includes('user-not-found')) {
+              await signUpWithPhonePassword(name, phone, password, city);
+              setInfo('تم إنشاء حسابك برقمك وكلمة المرور — يمكنك الدخول من أي جهاز بنفس البيانات.');
+            } else {
+              throw new Error('هذا الرقم مسجّل بكلمة مرور مختلفة. تأكد من كلمة المرور.');
+            }
+          }
+        } else {
+          await signInQuickPhone(name, phone, city);
+          setInfo('تم إنشاء حسابك السريع. أضف كلمة مرور في المرة القادمة لحفظ الحساب على أي جهاز.');
+        }
       } else {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
         if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
@@ -155,6 +172,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   ))}
                 </select>
               </Field>
+              {mode === 'quick' && (
+                <Field icon={<Lock className="w-4 h-4" />} label="كلمة المرور (اختيارية، لكنها تحفظ حسابك على أي جهاز)">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="6 أحرف على الأقل"
+                    className="w-full pr-9 pl-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                  />
+                </Field>
+              )}
             </>
           )}
 

@@ -62,9 +62,12 @@ service cloud.firestore {
     // إعلانات السيارات
     match /cars/{carId} {
       allow get, list: if true;
-      allow create: if isValidCar(incoming()) && isSignedIn() && incoming().ownerId == request.auth.uid;
+      // لا يستطيع الناشر اعتماد إعلانه بنفسه (الاعتماد من لوحة Firebase أو لوحة الإدارة)
+      allow create: if isValidCar(incoming()) && isSignedIn() && incoming().ownerId == request.auth.uid
+        && (!('status' in incoming()) || incoming().status in ['pending', 'rejected']);
       // حماية الملكية: المالك فقط من يمكنه تعديل أو حذف إعلانه
-      allow update: if isSignedIn() && isValidCarUpdate(incoming()) && existing().ownerId == request.auth.uid;
+      allow update: if isSignedIn() && isValidCarUpdate(incoming()) && existing().ownerId == request.auth.uid
+        && (!('status' in incoming()) || incoming().status == existing().status);
       allow delete: if isSignedIn() && existing().ownerId == request.auth.uid;
     }
 

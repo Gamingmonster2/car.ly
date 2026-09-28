@@ -17,6 +17,36 @@ const CARS_COLLECTION = 'cars';
 /** أقصى عدد إعلانات تُحمّل في الصفحة الرئيسية (يمنع تحميل آلاف المستندات مع نمو الموقع) */
 const HOME_LIMIT = 60;
 
+/** مدة صلاحية الإعلان بالأيام */
+export const AD_VALID_DAYS = 30;
+/** مدة السماح بعد الانتهاء: يظل الإعلان ظاهراً بشكل باهت قبل إخفائه نهائياً */
+export const AD_GRACE_DAYS = 30;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** تاريخ الانتهاء الافتراضي لإعلان نُشر في لحظة معيّنة */
+export function defaultExpiresAt(createdAt: number): number {
+  return createdAt + AD_VALID_DAYS * DAY_MS;
+}
+
+/** هل انتهت صلاحية الإعلان؟ */
+export function isExpired(car: Car, now = Date.now()): boolean {
+  if (!car.expiresAt) return false;
+  return car.expiresAt < now;
+}
+
+/** هل تجاوز الإعلان مدة السماح (فيُخفى تماماً)؟ */
+export function isBeyondGrace(car: Car, now = Date.now()): boolean {
+  if (!car.expiresAt) return false;
+  return car.expiresAt + AD_GRACE_DAYS * DAY_MS < now;
+}
+
+/** الأيام المتبقية قبل انتهاء الصلاحية (سالب إذا انتهت) */
+export function daysLeft(car: Car, now = Date.now()): number | null {
+  if (!car.expiresAt) return null;
+  return Math.ceil((car.expiresAt - now) / DAY_MS);
+}
+
 /** أقصى مدة انتظار لقاعدة البيانات قبل التحويل إلى وضع العرض التجريبي */
 const LOAD_TIMEOUT_MS = 12000;
 
@@ -79,10 +109,14 @@ export const carService = {
         getDocs(query(collection(db, CARS_COLLECTION), limit(HOME_LIMIT))),
         LOAD_TIMEOUT_MS,
       );
-      const cars = snapshot.docs.map((docSnap) => ({
-        ...(docSnap.data() as Omit<Car, 'id'>),
-        id: docSnap.id,
-      }));
+      const now = Date.now();
+      const cars = snapshot.docs
+        .map((docSnap) => ({
+          ...(docSnap.data() as Omit<Car, 'id'>),
+          id: docSnap.id,
+        }))
+        // الإعلانات الجديدة تنتظر المراجعة (لا تظهر للزوار)، والمنتهية تُخفى بعد مدة السماح
+        .filter((car) => (car.status ?? 'approved') === 'approved' && !isBeyondGrace(car, now));
       return { cars: sortByDate(cars), online: true };
     } catch (error) {
       console.error('تعذر قراءة الإعلانات من Firestore:', error);

@@ -17,6 +17,10 @@ export interface Car {
   city: string;
   description: string;
   createdAt?: number;
+  /** تاريخ انتهاء صلاحية الإعلان (بالمللي ثانية) — الافتراضي 30 يوماً من النشر */
+  expiresAt?: number;
+  /** حالة المراجعة: pending = بانتظار الموافقة (لا يظهر للزوار)، approved = منشور */
+  status?: 'pending' | 'approved' | 'rejected';
   /** معرّف صاحب الإعلان: أساس الملكية والتعديل والحذف */
   ownerId?: string;
   ownerName?: string;

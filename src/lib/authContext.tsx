@@ -88,6 +88,13 @@ interface AuthContextValue {
    * على uid حقيقي يقبل به Firestore، ثم يوثّق رقمه عبر واتساب. لا يحتاج كلمة مرور.
    */
   signInQuickPhone: (name: string, phone: string, city?: string) => Promise<void>;
+  /**
+   * تسجيل بالاسم ورقم الهاتف وكلمة مرور — بلا بريد إلكتروني وبلا رسوم SMS.
+   * يُنشأ بريد داخلي مشتق من الرقم (لا يراه المستخدم) ليعمل الحساب من أي جهاز.
+   */
+  signUpWithPhonePassword: (name: string, phone: string, password: string, city?: string) => Promise<void>;
+  /** دخول بنفس الرقم وكلمة المرور من أي جهاز */
+  signInWithPhonePassword: (phone: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   /** إرسال رمز SMS (يحتاج تفعيل الخطة المدفوعة) */
@@ -251,6 +258,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await signInWithPopup(auth, provider);
   };
 
+  /** بريد داخلي مشتق من رقم الهاتف — المستخدم لا يراه ولا يحتاجه */
+  const syntheticEmail = (phone: string) => `${normalizeWhatsApp(phone)}@carslibya.app`;
+
+  const signUpWithPhonePassword = async (name: string, phone: string, password: string, city?: string) => {
+    const cleanName = name.trim();
+    const normalizedPhone = normalizeWhatsApp(phone);
+    const credential = await createUserWithEmailAndPassword(auth, syntheticEmail(normalizedPhone), password);
+    try {
+      await updateAuthProfile(credential.user, { displayName: cleanName });
+    } catch {
+      /* غير حرج */
+    }
+    await saveProfile({
+      uid: credential.user.uid,
+      displayName: cleanName,
+      phone: normalizedPhone,
+      city: city || 'طرابلس',
+      avatarEmoji: '🚗',
+      phoneStatus: 'pending',
+      phoneVerified: false,
+      createdAt: Date.now(),
+    });
+  };
+
+  const signInWithPhonePassword = async (phone: string, password: string) => {
+    await signInWithEmailAndPassword(auth, syntheticEmail(normalizeWhatsApp(phone)), password);
+  };
+
   const signInQuickPhone = async (name: string, phone: string, city?: string) => {
     const cleanName = name.trim();
     const normalizedPhone = normalizeWhatsApp(phone);
@@ -351,6 +386,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     signUpWithEmail,
     signInWithEmail,
     signInQuickPhone,
+    signUpWithPhonePassword,
+    signInWithPhonePassword,
     signInWithGoogle,
     resetPassword,
     startPhoneVerification,
