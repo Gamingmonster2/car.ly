@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <rect width="800" height="500" fill="#e2e8f0"/>
+  <path d="M232 316l24-64a20 20 0 0 1 18.7-13h250.6a20 20 0 0 1 18.7 13l24 64v74h-30v-26H262v26h-30z" fill="#94a3b8"/>
+  <path d="M274 260h252l18 46H256z" fill="#cbd5e1"/>
+  <circle cx="290" cy="366" r="20" fill="#64748b"/>
+  <circle cx="510" cy="366" r="20" fill="#64748b"/>
+  <text x="400" y="470" font-family="system-ui, sans-serif" font-size="26" font-weight="700" fill="#64748b" text-anchor="middle">لا توجد صورة للسيارة</text>
+</svg>

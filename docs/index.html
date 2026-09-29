@@ -6,7 +6,7 @@
     <title>Cars Libya | سوق السيارات في ليبيا</title>
     <meta name="description" content="منصة cars.com.ly لبيع وشراء السيارات في ليبيا. تواصل مباشر عبر الواتساب وسهولة تامة في التصفح." />
     <meta name="theme-color" content="#2563eb" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 
     <meta property="og:title" content="Cars Libya | سوق السيارات في ليبيا" />
     <meta property="og:description" content="منصة cars.com.ly لبيع وشراء السيارات في ليبيا. تواصل مباشر عبر الواتساب وسهولة تامة في التصفح." />
@@ -17,10 +17,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="سيارات ليبيا" />
+    <script type="module" crossorigin src="./assets/index-Cr81NrtI.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/react-BZPdts19.js">
+    <link rel="modulepreload" crossorigin href="./assets/firebase-Cc5DedZm.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-BtUjd3Zm.css">
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
 
     <script>
       // في حال فتح المستخدم ملف index.html مباشرة من القرص (file://) بدون خادم
@@ -41,17 +44,6 @@
             document.body.appendChild(box);
           }
         }, 1200);
-      }
-    </script>
-    <script type="module">
-      // تأمين: إذا كان الموقع يخدم ملفات المصدر خاماً (GitHub Pages: Deploy from a branch)
-      // فلا يوجد سكربت /assets/ — عندها نجرب تشغيل مدخل Vite، وإن فشل نحوّل الزائر للنسخة المبنية في docs/
-      if (!document.querySelector('script[src*="/assets/"]')) {
-        import('/src/main.tsx').catch(function () {
-          if (window.location.pathname.indexOf('/docs/') === -1) {
-            window.location.replace('./docs/');
-          }
-        });
       }
     </script>
   </body>
