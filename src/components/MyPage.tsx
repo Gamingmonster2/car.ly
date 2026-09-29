@@ -12,7 +12,8 @@ import {
   UserCircle2,
 } from 'lucide-react';
 import { useAuth } from '../lib/authContext';
-import { carService, describeFirestoreError } from '../lib/carService';
+import { carService, describeFirestoreError, isExpired } from '../lib/carService';
+import { timeAgo } from '../lib/timeAgo';
 import { compressAvatarFile } from '../lib/image';
 import { displayLocal, isValidWhatsApp, prettyPhone } from '../lib/phone';
 import type { Car } from '../types';
@@ -285,10 +286,23 @@ export default function MyPage({ onBack, onEdit, onToast }: MyPageProps) {
                   loading="lazy"
                 />
                 <div className="flex-1 min-w-[160px]">
-                  <p className="font-black text-slate-900 text-sm">
-                    {car.make} {car.model} <span className="text-slate-400 font-normal">({car.year})</span>
+                  <p className="font-black text-slate-900 text-sm flex items-center gap-2 flex-wrap">
+                    <span>{car.make} {car.model} <span className="text-slate-400 font-normal">({car.year})</span></span>
+                    {car.status === 'pending' && (
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md">
+                        قيد المراجعة
+                      </span>
+                    )}
+                    {isExpired(car) && (
+                      <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded-md">
+                        انتهت الصلاحية
+                      </span>
+                    )}
+                    {car.createdAt && <span className="text-[10px] text-slate-400 font-normal">{timeAgo(car.createdAt)}</span>}
                   </p>
-                  <p className="text-blue-600 font-bold text-sm">{car.price.toLocaleString()} د.ل</p>
+                  <p className="text-blue-600 font-bold text-sm">
+                    {car.price > 0 ? `${car.price.toLocaleString()} د.ل` : 'السعر عند الاتصال'}
+                  </p>
                   <p className="text-[11px] text-slate-500">
                     {car.city} • {car.mileage}
                     {car.images && car.images.length > 1 ? ` • ${car.images.length} صور` : ''}
