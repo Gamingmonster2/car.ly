@@ -11,3 +11,14 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 );
+
+// تفعيل العمل بلا إنترنت (PWA) في نسخة الإنتاج فقط
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`)
+      .catch(() => {
+        /* لا نُفشل التطبيق إن لم يدعم المتصفح ذلك */
+      });
+  });
+}
