@@ -199,7 +199,7 @@ export default function MyPage({ onBack, onEdit, onToast }: MyPageProps) {
 
         <div className="grid sm:grid-cols-3 gap-3 mt-5">
           <Input label="الاسم" value={draft.displayName} onChange={(v) => setDraft({ ...draft, displayName: v })} />
-          <Input label="رقم الواتساب" value={draft.phone} onChange={(v) => setDraft({ ...draft, phone: v })} placeholder="0912345678" />
+          <Input label="رقم الواتساب" dir="ltr" value={draft.phone} onChange={(v) => setDraft({ ...draft, phone: v })} placeholder="0912345678" />
           <Input label="المدينة" value={draft.city} onChange={(v) => setDraft({ ...draft, city: v })} />
         </div>
 
@@ -338,16 +338,19 @@ function Input({
   value,
   onChange,
   placeholder,
+  dir,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  dir?: 'ltr' | 'rtl';
 }) {
   return (
     <div>
       <label className="block text-xs font-bold text-slate-700 mb-1">{label}</label>
       <input
+        dir={dir}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}

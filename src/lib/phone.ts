@@ -31,8 +31,16 @@ export function displayLocal(raw: string): string {
 /** رقم مختصر للقراءة: 0912 345 678 */
 export function prettyPhone(raw: string): string {
   const local = displayLocal(raw);
-  if (local.length === 10) return local.slice(0, 4) + ' ' + local.slice(4, 7) + ' ' + local.slice(7);
-  return local;
+  const grouped =
+    local.length === 10 ? local.slice(0, 4) + ' ' + local.slice(4, 7) + ' ' + local.slice(7) : local;
+  // عزل اتجاهي (LRI…PDI): يضمن ظهور الرقم بترتيبه الصحيح داخل النص العربي
+  // فلا يظهر معكوساً في الواجهة ولا في رسائل الواتساب
+  return '\u2066' + grouped + '\u2069';
+}
+
+/** يعزل أي نص لاتيني/رقمي حتى يظهر بترتيبه الصحيح داخل واجهة عربية */
+export function isolateLtr(text: string): string {
+  return '\u2066' + text + '\u2069';
 }
 
 /** رابط محادثة واتساب مع نص جاهز */

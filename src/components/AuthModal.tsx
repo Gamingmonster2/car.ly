@@ -166,7 +166,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  inputMode="tel"
+                  inputMode="tel" dir="ltr"
                   placeholder="0912345678"
                   className="w-full pr-9 pl-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 />
@@ -272,7 +272,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           {profile ? (
             profile.phoneStatus === 'verified' ? (
               <p className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">
-                رقمك موثّق ✔ ({displayLocal(profile.phone ?? '')})
+                رقمك موثّق ✔ (<span dir="ltr" className="inline-block">{displayLocal(profile.phone ?? '')}</span>)
               </p>
             ) : (
               <div className="space-y-2">
@@ -280,7 +280,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   <input
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    inputMode="tel"
+                    inputMode="tel" dir="ltr"
                     placeholder="0912345678"
                     className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                   />
