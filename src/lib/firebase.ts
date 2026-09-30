@@ -53,7 +53,7 @@ auth.languageCode = 'ar';
  * رقم واتساب إدارة الموقع (يُستخدم لاستقبال كود توثيق الحسابات).
  * يمكن تغييره من ملف .env باسم VITE_ADMIN_WHATSAPP
  */
-export const ADMIN_WHATSAPP = import.meta.env.VITE_ADMIN_WHATSAPP ?? '218931792006';
+export const ADMIN_WHATSAPP = import.meta.env.VITE_ADMIN_WHATSAPP ?? '218944119965';
 
 /**
  * تفعيل رمز تحقق SMS عبر Firebase Phone Auth.
