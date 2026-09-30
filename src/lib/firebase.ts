@@ -60,4 +60,4 @@ export const ADMIN_WHATSAPP = import.meta.env.VITE_ADMIN_WHATSAPP ?? '2189317920
  * لا يعمل إلا بعد ترقية مشروع Firebase إلى خطة Blaze (الرسائل مدفوعة) وتفعيل مزوّد Phone
  * والسماح بمنطقة ليبيا (+218) في سياسة مناطق SMS. لذلك هو مغلق افتراضياً.
  */
-export const PHONE_OTP_ENABLED = import.meta.env.VITE_ENABLE_PHONE_OTP === 'true';
+export const PHONE_OTP_ENABLED = import.meta.env.VITE_ENABLE_PHONE_OTP !== 'false';

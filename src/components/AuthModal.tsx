@@ -78,8 +78,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             }
           }
         } else {
-          await signInQuickPhone(name, phone, city);
-          setInfo('تم إنشاء حسابك السريع. أضف كلمة مرور في المرة القادمة لحفظ الحساب على أي جهاز.');
+          try {
+            await signInQuickPhone(name, phone, city);
+            setInfo('تم إنشاء حسابك السريع. أضف كلمة مرور في المرة القادمة لحفظ الحساب على أي جهاز.');
+          } catch (err) {
+            const code = String((err as { code?: string })?.code ?? '');
+            if (code.includes('operation-not-allowed')) {
+              throw new Error(
+                '«الدخول السريع» غير مفعّل في مشروع Firebase (مزوّد Anonymous). اكتب كلمة مرور من 6 أحرف وسننشئ لك حساباً دائماً بنفس الرقم — أو فعّل Anonymous من لوحة Firebase.',
+              );
+            }
+            throw err;
+          }
         }
       } else {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
