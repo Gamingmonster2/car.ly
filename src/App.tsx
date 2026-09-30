@@ -407,7 +407,12 @@ function CarCard({
 
         <div className="pt-3 border-t border-slate-100 flex gap-2">
           <a
-            href={waLink(car.whatsapp, `السلام عليكم، مهتم بسيارة ${car.make} ${car.model} موديل ${car.year} المعروضة في cars.com.ly بسعر ${car.price.toLocaleString()} د.ل`)}
+            href={waLink(
+              car.whatsapp,
+              car.price > 0
+                ? `السلام عليكم، وجدت إعلان ${car.make} ${car.model} موديل ${car.year} على موقع cars.com.ly بسعر ${car.price.toLocaleString()} دينار وأنا مهتم.`
+                : `السلام عليكم، وجدت إعلان ${car.make} ${car.model} موديل ${car.year} على موقع cars.com.ly وأنا مهتم، وأرجو إخباري بالتفاصيل والسعر.`,
+            )}
             target="_blank"
             rel="noreferrer"
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm"
