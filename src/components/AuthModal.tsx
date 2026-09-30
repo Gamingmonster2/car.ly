@@ -27,7 +27,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     profile,
   } = useAuth();
 
-  const [mode, setMode] = useState<Mode>('quick');
+  const [mode, setMode] = useState<Mode>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -60,7 +60,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     event.preventDefault();
     run(async () => {
       if (mode === 'login') {
-        await signInWithEmail(email, password);
+        if (email.includes('@')) {
+          await signInWithEmail(email, password);
+        } else {
+          await signInWithPhonePassword(email, password);
+        }
       } else if (mode === 'quick') {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
         if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
@@ -94,7 +98,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       } else {
         if (name.trim().length < 2) throw new Error('اكتب اسمك (حرفان على الأقل).');
         if (!isValidWhatsApp(phone)) throw new Error('رقم الواتساب غير صحيح. مثال: 0912345678 أو 218912345678');
-        await signUpWithEmail(email, password, name, phone, city);
+        if (email.includes('@')) {
+          await signUpWithEmail(email, password, name, phone, city);
+        } else {
+          await signUpWithPhonePassword(name, phone, password, city);
+        }
         setInfo('تم إنشاء حسابك. يمكنك الآن توثيق رقم واتساب من صفحتك الشخصية.');
       }
       onSuccess?.();
@@ -114,7 +122,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </button>
 
         <h3 className="text-xl font-black text-slate-900 mb-1">
-          {mode === 'login' ? 'تسجيل الدخول' : mode === 'quick' ? 'دخول سريع برقم الواتساب' : 'إنشاء حساب جديد'}
+          {mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
         </h3>
         <p className="text-xs text-slate-500 mb-4">
           {mode === 'quick'
@@ -123,7 +131,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </p>
 
         <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl mb-4 text-[11px] font-bold">
-          {([['login', 'دخول'], ['signup', 'حساب جديد'], ['quick', 'دخول سريع 📱']] as const).map(([value, label]) => (
+          {([['login', 'دخول'], ['signup', 'حساب جديد']] as const).map(([value, label]) => (
             <button
               key={value}
               onClick={() => { setMode(value); setError(null); setInfo(null); }}
@@ -197,13 +205,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {mode !== 'quick' && (<>
-          <Field icon={<Mail className="w-4 h-4" />} label="البريد الإلكتروني">
+          <Field
+            icon={<Mail className="w-4 h-4" />}
+            label={mode === 'login' ? 'البريد الإلكتروني أو رقم الهاتف' : 'البريد الإلكتروني (اختياري)'}
+          >
             <input
-              type="email"
+              type={mode === 'login' ? 'text' : 'email'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="name@example.com"
+              required={mode === 'login'}
+              placeholder={mode === 'login' ? 'example@mail.com أو 0912345678' : 'اتركه فارغاً للتسجيل برقم الهاتف'}
               className="w-full pr-9 pl-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
             />
           </Field>
@@ -232,7 +243,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             }`}
           >
             {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-            <span>{mode === 'login' ? 'دخول' : mode === 'quick' ? 'ابدأ الآن' : 'إنشاء الحساب'}</span>
+            <span>{mode === 'login' ? 'دخول' : 'إنشاء الحساب'}</span>
           </button>
         </form>
 
